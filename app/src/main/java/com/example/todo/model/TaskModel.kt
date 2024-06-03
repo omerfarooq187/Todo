@@ -3,7 +3,6 @@ package com.example.todo.model
 import com.example.todo.data.local.TaskEntity
 
 data class TaskModel(
-    val id: Int,
     val title: String,
     val description: String,
 )
@@ -11,7 +10,6 @@ data class TaskModel(
 //mapper
 fun TaskEntity.toTaskModel() :TaskModel{
     return TaskModel(
-        id = this.id,
         title = this.title,
         description = this.description
     )

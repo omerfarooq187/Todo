@@ -26,4 +26,8 @@ class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
     suspend fun deleteData(taskModel: TaskModel) {
         taskDao.deleteTask(taskModel.toTaskEntity())
     }
+
+    suspend fun deleteAllData() {
+        taskDao.deleteAllTasks()
+    }
 }

@@ -25,11 +25,19 @@ class MainViewModel @Inject constructor(private val repository: TasksRepository)
         }
     }
 
-    suspend fun addTask(task: TaskModel) {
-        repository.insertData(task)
+    fun addTask(task: TaskModel) {
+        viewModelScope.launch {
+            repository.insertData(task)
+        }
     }
 
     suspend fun deleteTask(task: TaskModel) {
         repository.deleteData(task)
+    }
+
+    fun deleteAllTasks() {
+        viewModelScope.launch {
+            repository.deleteAllData()
+        }
     }
 }
