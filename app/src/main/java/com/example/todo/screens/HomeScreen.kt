@@ -74,10 +74,10 @@ fun HomeScreenContents(navController: NavController, mainViewModel: MainViewMode
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 navController.navigate(
-                    EditTaskScreenRoute (
-                        title = "title",
-                        description = "description",
-                        time = System.currentTimeMillis()
+                    EditTaskScreenRoute(
+                        null,
+                        null,
+                        System.currentTimeMillis()
                     )
                 )
             }) {

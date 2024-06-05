@@ -21,8 +21,8 @@ import kotlinx.serialization.Serializable
     data object HomeScreenRoute
     @Serializable
     data class EditTaskScreenRoute  (
-        val title:String,
-        val description:String,
+        val title:String?,
+        val description:String?,
         val time: Long
     )
 

@@ -41,10 +41,10 @@ fun EditTaskScreen(
 @Composable
 fun EditTaskScreenContents(navController: NavController, mainViewModel: MainViewModel, args: EditTaskScreenRoute) {
     var title by remember {
-        mutableStateOf(args.title)
+        mutableStateOf(args.title?:"")
     }
     var description by remember {
-        mutableStateOf(args.description)
+        mutableStateOf(args.description?:"")
     }
     var time by remember {
         mutableLongStateOf(args.time)
