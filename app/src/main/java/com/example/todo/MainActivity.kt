@@ -9,16 +9,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.todo.screens.EditTaskScreen
 import com.example.todo.screens.HomeScreen
 import com.example.todo.ui.theme.ToDoTheme
 import com.example.todo.viewModel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
 
-sealed class DestinationScreen(val route: String) {
-    data object HomeScreenRoute : DestinationScreen("home")
-    data object EditTaskScreenRoute : DestinationScreen("edit")
-}
+    @Serializable
+    data object HomeScreenRoute
+    @Serializable
+    data class EditTaskScreenRoute  (
+        val title:String,
+        val description:String,
+        val time: Long
+    )
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -39,13 +45,14 @@ fun App(mainViewModel: MainViewModel) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = DestinationScreen.HomeScreenRoute.route
+        startDestination = HomeScreenRoute
     ) {
-        composable(DestinationScreen.HomeScreenRoute.route) {
-            HomeScreen(navController, mainViewModel)
+        composable<HomeScreenRoute> {
+            HomeScreen(navController = navController, mainViewModel = mainViewModel)
         }
-        composable(DestinationScreen.EditTaskScreenRoute.route) {
-            EditTaskScreen(navController, mainViewModel)
+        composable<EditTaskScreenRoute> {
+            val args = it.toRoute<EditTaskScreenRoute>()
+            EditTaskScreen(navController, mainViewModel, args)
         }
     }
 }

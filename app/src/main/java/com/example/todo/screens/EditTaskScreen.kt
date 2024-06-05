@@ -1,37 +1,14 @@
 package com.example.todo.screens
 
-import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,29 +19,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
+import com.example.todo.EditTaskScreenRoute
 import com.example.todo.model.TaskModel
 import com.example.todo.viewModel.MainViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun EditTaskScreen(navController: NavController, mainViewModel: MainViewModel) {
-    EditTaskScreenContents(navController, mainViewModel)
+fun EditTaskScreen(
+    navController: NavController,
+    mainViewModel: MainViewModel,
+    args: EditTaskScreenRoute
+) {
+    EditTaskScreenContents(navController, mainViewModel, args)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditTaskScreenContents(navController: NavController, mainViewModel: MainViewModel) {
+fun EditTaskScreenContents(navController: NavController, mainViewModel: MainViewModel, args: EditTaskScreenRoute) {
     var title by remember {
-        mutableStateOf("")
+        mutableStateOf(args.title)
     }
     var description by remember {
-        mutableStateOf("")
+        mutableStateOf(args.description)
     }
+    var time by remember {
+        mutableLongStateOf(args.time)
+    }
+
     val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -86,17 +73,19 @@ fun EditTaskScreenContents(navController: NavController, mainViewModel: MainView
                                 if (validateFields(title, description)) {
                                     val task = TaskModel(
                                         title = title,
-                                        description = description
+                                        description = description,
+                                        time = time
                                     )
                                     mainViewModel.addTask(task)
                                     navController.popBackStack()
-                                }
-                                else {
-                                    Toast.makeText(
-                                        context,
-                                        "Please fill all the fields",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Please fill all the fields",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
                             }
                     )
@@ -144,8 +133,15 @@ fun EditTaskScreenContents(navController: NavController, mainViewModel: MainView
                             unfocusedIndicatorColor = Color.Transparent
                         )
                 )
-                //TimePicker
-                TimePickerDialogBox()
+                Spacer(modifier = Modifier.height(16.dp))
+                // TimePicker
+                TimePickerDialogBox(
+                    initialTime = time,
+                    onTimeSelected = { selectedTime ->
+                        time = selectedTime
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     value = description,
                     onValueChange = {
@@ -183,10 +179,20 @@ fun validateFields(title: String, description: String): Boolean {
 }
 
 @Composable
-fun TimePickerDialogBox() {
+fun TimePickerDialogBox(
+    initialTime: Long,
+    onTimeSelected: (Long) -> Unit
+) {
     var pickedTime by remember {
-        mutableStateOf(LocalTime.now())
+        mutableStateOf(
+            if (initialTime > 0) {
+                Instant.ofEpochMilli(initialTime).atZone(ZoneId.systemDefault()).toLocalTime()
+            } else {
+                LocalTime.now()
+            }
+        )
     }
+
     val formattedTime by remember {
         derivedStateOf {
             DateTimeFormatter
@@ -196,6 +202,7 @@ fun TimePickerDialogBox() {
     }
 
     val dialogState = rememberMaterialDialogState()
+
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
@@ -232,12 +239,18 @@ fun TimePickerDialogBox() {
         MaterialDialog(
             dialogState = dialogState,
             buttons = {
-                positiveButton(text = "Ok")
+                positiveButton(text = "Ok") {
+                    val selectedTimeInMillis = pickedTime.atDate(LocalDate.now())
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                    onTimeSelected(selectedTimeInMillis)
+                }
                 negativeButton(text = "Cancel")
             }
         ) {
             this.timepicker(
-                initialTime = LocalTime.now()
+                initialTime = pickedTime
             ) {
                 pickedTime = it
             }

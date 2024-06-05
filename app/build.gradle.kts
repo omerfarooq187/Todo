@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -77,7 +79,10 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     //compose navigation
     implementation(libs.androidx.navigation.compose)
-
+    //Dialog box and time picker dependencies
     implementation (libs.core)
     implementation (libs.datetime)
+
+    //Kotlinx-serialization
+    implementation(libs.kotlinx.serialization.json)
 }

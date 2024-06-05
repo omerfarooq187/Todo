@@ -2,7 +2,6 @@ package com.example.todo.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
-import com.example.todo.DestinationScreen
+import com.example.todo.EditTaskScreenRoute
+import com.example.todo.model.TaskModel
 import com.example.todo.viewModel.MainViewModel
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 
 @Composable
 fun HomeScreen(navController: NavController, mainViewModel: MainViewModel) {
@@ -70,7 +73,13 @@ fun HomeScreenContents(navController: NavController, mainViewModel: MainViewMode
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navController.navigate(DestinationScreen.EditTaskScreenRoute.route)
+                navController.navigate(
+                    EditTaskScreenRoute (
+                        title = "title",
+                        description = "description",
+                        time = System.currentTimeMillis()
+                    )
+                )
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -96,8 +105,17 @@ fun HomeScreenContents(navController: NavController, mainViewModel: MainViewMode
                     items(tasksList.value) { task->
                         TaskItem(
                             title = task.title,
-                            description = task.description
-                        )
+                            description = task.description,
+                            time = task.time
+                        ) {
+                            navController.navigate(
+                                EditTaskScreenRoute(
+                                    it.title,
+                                    it.description,
+                                    it.time
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -107,7 +125,7 @@ fun HomeScreenContents(navController: NavController, mainViewModel: MainViewMode
 }
 
 @Composable
-fun TaskItem(title:String, description:String) {
+fun TaskItem(title:String, description:String, time:Long, onItemClick:(TaskModel)->Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,6 +136,15 @@ fun TaskItem(title:String, description:String) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable {
+                    onItemClick(
+                        TaskModel(
+                            title = title,
+                            description = description,
+                            time = time
+                        )
+                    )
+                }
         ) {
             Text(
                 text = title,
