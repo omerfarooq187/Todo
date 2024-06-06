@@ -1,6 +1,7 @@
 package com.example.todo.di
 
 import android.app.Application
+import android.app.NotificationManager
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -8,6 +9,7 @@ import com.example.todo.data.local.TaskDao
 import com.example.todo.data.local.TaskDatabase
 import com.example.todo.data.local.TaskEntity
 import com.example.todo.utils.alarmManager.TaskAlarmScheduler
+import com.example.todo.utils.alarmManager.TaskNotification
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,8 +37,15 @@ object AppModule {
         return database.taskDao()
     }
 
+    @Singleton
     @Provides
     fun providesTaskAlarmScheduler(@ApplicationContext context: Context): TaskAlarmScheduler {
         return TaskAlarmScheduler(context)
+    }
+
+    @Singleton
+    @Provides
+    fun providesNotificationManager(@ApplicationContext context: Context): TaskNotification {
+        return TaskNotification(context)
     }
 }

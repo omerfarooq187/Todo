@@ -21,6 +21,7 @@ import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import com.example.todo.EditTaskScreenRoute
 import com.example.todo.model.TaskModel
+import com.example.todo.utils.alarmManager.AlarmItem
 import com.example.todo.viewModel.MainViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -77,6 +78,14 @@ fun EditTaskScreenContents(navController: NavController, mainViewModel: MainView
                                         time = time
                                     )
                                     mainViewModel.addTask(task)
+                                    val alarmItem = AlarmItem(
+                                        title = title,
+                                        description = description,
+                                        time = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault())
+                                    )
+                                    mainViewModel.setAlarm(
+                                        alarmItem
+                                    )
                                     navController.popBackStack()
                                 } else {
                                     Toast

@@ -12,7 +12,8 @@ class TaskAlarmScheduler(
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
     override fun schedule(item: AlarmItem) {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            this.putExtra("MESSAGE",item.message)
+            this.putExtra("TITLE",item.title)
+            this.putExtra("DESCRIPTION",item.description)
         }
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
